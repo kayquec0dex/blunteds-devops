@@ -1,9 +1,11 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -47,9 +49,7 @@ func metricsMiddleware() gin.HandlerFunc {
 		defer requestsInFlight.Dec()
 
 		start := time.Now()
-
 		c.Next()
-
 		duration := time.Since(start).Seconds()
 		status := strconv.Itoa(c.Writer.Status())
 
@@ -59,17 +59,20 @@ func metricsMiddleware() gin.HandlerFunc {
 }
 
 func main() {
-	r := gin.Default()
+	log.Println("[INFO] Iniciando blunteds-devops-api...")
 
+	r := gin.Default()
 	r.Use(metricsMiddleware())
 
 	r.GET("/health", func(c *gin.Context) {
+		log.Printf("[INFO] health check requested from %s", c.ClientIP())
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 		})
 	})
 
 	r.GET("/", func(c *gin.Context) {
+		log.Printf("[INFO] root requested from %s", c.ClientIP())
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Bem-vindo à DevOps API! v2",
 		})
@@ -77,5 +80,6 @@ func main() {
 
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
+	log.Println("[INFO] Server listening on :8080")
 	r.Run(":8080")
 }
