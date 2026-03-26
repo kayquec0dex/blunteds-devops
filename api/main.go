@@ -17,7 +17,7 @@ func main() {
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Bem-vindo à DevOps API!",
+			"message": "Bem-vindo à DevOps API! v2",
 		})
 	})
 
