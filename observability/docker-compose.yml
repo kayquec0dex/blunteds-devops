@@ -8,6 +8,8 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     restart: unless-stopped
+    networks:
+      - observability
 
   loki:
     image: grafana/loki:latest
@@ -16,7 +18,10 @@ services:
       - "3100:3100"
     volumes:
       - ./loki-config.yml:/etc/loki/local-config.yaml
+      - /loki:/loki
     restart: unless-stopped
+    networks:
+      - observability
 
   promtail:
     image: grafana/promtail:latest
@@ -26,6 +31,8 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
+    networks:
+      - observability
 
   grafana:
     image: grafana/grafana:latest
@@ -38,3 +45,9 @@ services:
       - prometheus
       - loki
     restart: unless-stopped
+    networks:
+      - observability
+
+networks:
+  observability:
+    driver: bridge
