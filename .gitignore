@@ -1,0 +1,9 @@
+# Vagrant
+.vagrant/
+
+# Go
+api/vendor/
+api/*.exe
+
+# Docker
+observability/.env
