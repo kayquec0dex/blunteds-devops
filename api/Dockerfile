@@ -1,24 +1,12 @@
-# ── Estágio 1: build ────────────────────────────────
-FROM golang:1.25-alpine AS builder
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copia os arquivos de dependências primeiro
-COPY go.mod go.sum ./
-RUN go mod download
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o código e compila
-COPY . .
-RUN go build -o api .
-
-# ── Estágio 2: imagem final ─────────────────────────
-FROM alpine:latest
-
-WORKDIR /app
-
-# Copia só o binário compilado do estágio anterior
-COPY --from=builder /app/api .
+COPY main.py .
 
 EXPOSE 8080
 
-CMD ["./api"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
